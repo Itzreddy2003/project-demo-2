@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi"; // Importing icons
-import screenshot from "../assets/screenshot.png";
+import screenshot3 from "../assets/screenshot3.png";
 import SegmentedCircleBar from "../component/SegmentedCircleBar";
 
-const Floor1 = () => {
+const Floor3 = () => {
   const [isServer1Open, setIsServer1Open] = useState(false);
   const [isServer2Open, setIsServer2Open] = useState(false);
 
@@ -71,7 +71,7 @@ const Floor1 = () => {
           {/* Image Div */}
           <div className="h-[400px] w-full bg-gray-200 rounded-3xl">
             <img
-              src={screenshot}
+              src={screenshot3}
               alt="Picture 1"
               className="w-full h-full object-fit rounded-3xl"
             />
@@ -180,4 +180,4 @@ const Floor1 = () => {
   );
 };
 
-export default Floor1;
+export default Floor3;

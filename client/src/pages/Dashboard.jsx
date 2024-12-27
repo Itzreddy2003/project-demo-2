@@ -1,208 +1,216 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import SegmentedCircleBar from "../component/SegmentedCircleBar";
 
 const Dashboard = () => {
-  // State to handle toggle for the smaller divs inside the first four larger divs
-  const [toggleStates, setToggleStates] = useState({
-    div1: true,
-    div2: true,
-    div1Placeholder: true,
-    div2Placeholder: true,
-    div1RowPlaceholder: true,
-    div2RowPlaceholder: true,
-    alert1Row1: true,
-    alert1Row2: true,
-    alert1Row3: true,
-    alert2Row1: true,
-    alert2Row2: true,
-    alert2Row3: true,
-  });
+  const items = [
+    { id: 1, text: "ELECTRICAL ROOM" },
+    { id: 2, text: "UPS ROOM" },
+    { id: 3, text: "ELECTRICAL ROOM" },
+    { id: 4, text: "UPS ROOM" },
+    { id: 5, text: "11F-AHU1" },
+    { id: 6, text: "11F-AHU2" },
+    { id: 7, text: "12F-AHU1" },
+    { id: 8, text: "12F-AHU2" },
+  ];
 
-  // Handler to toggle the state
-  const toggleHandler = (key) => {
+  const initialStatus = items.reduce((acc, item) => {
+    acc[item.id] = Math.random() > 0.5;
+    return acc;
+  }, {});
+
+  const [toggleStates, setToggleStates] = useState(initialStatus);
+
+  const toggleHandler = (id) => {
     setToggleStates((prev) => ({
       ...prev,
-      [key]: !prev[key],
+      [id]: !prev[id],
     }));
   };
 
+  // Function to change the status of all items randomly every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setToggleStates((prev) => {
+        const newStates = { ...prev };
+        Object.keys(newStates).forEach((key) => {
+          newStates[key] = Math.random() > 0.5; // Toggle the state randomly
+        });
+        return newStates;
+      });
+    }, 5000); // Change state every 5 seconds
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(interval);
+  }, []);
+
+  const randomValue = () => Math.floor(Math.random() * 100);
+
+  const data = [
+    {
+      id: 1,
+      title: "EX-FAN",
+      labels: ["PANTRY", "BATTERY RM"],
+    },
+    {
+      id: 2,
+      title: "ENERGY METER KW",
+      labels: ["11F", "12F"],
+    },
+  ];
+
+  const alerts = [
+    {
+      timestamp: "12:30pm, 12/12/24",
+      floor: "3",
+      server: "AIL_765_UL",
+      component: "AIU_258_0AS",
+      value: "30",
+    },
+    {
+      timestamp: "1:45pm, 12/12/24",
+      floor: "5",
+      server: "AIL_898_KL",
+      component: "AIU_784_PQZ",
+      value: "40",
+    },
+    {
+      timestamp: "3:15pm, 12/12/24",
+      floor: "1",
+      server: "AIL_432_AB",
+      component: "AIU_125_XYZ",
+      value: "35",
+    },
+  ];
+
   return (
     <>
-      <div className="w-[90%] h-[100%] flex gap-5">
+      <div className="w-[95%] h-[100%] flex gap-3">
         <div className="w-[80%] h-[100%] rounded-3xl bg-gray-100">
-          <div className="w-full flex flex-col justify-center items-center gap-10">
-            {/* Header */}
+          <div className="w-full flex flex-col justify-center items-center gap-5">
             <div className="w-full flex justify-between items-center px-10 pt-5">
               <h1 className="text-2xl">Dashboard</h1>
               <button className="bg-gradient-to-r from-purple-500 to-blue-500 text-white py-2 px-4 rounded-lg">
-                Add New Device +
+                Add New Floor +
               </button>
             </div>
-            {/* Image Div */}
-            <div className="w-[85%] h-[250px] bg-gray-200 rounded-3xl"></div>
-            {/* Device List */}
-            <div className="w-full flex justify-around gap-2 px-2">
-              {/* First 4 Divs with Toggle */}
-              {["div1", "div2"].map((divKey, index) => (
-                <div
-                  key={index}
-                  className="w-1/4  bg-gray-200 rounded-xl p-2 flex flex-col gap-2"
-                >
-                  {/* First Row with Status and Toggle */}
-                  <div className="flex justify-between items-center bg-gray-300 rounded-xl w-full h-1/2 px-2">
-                    <span
-                      className={`text-lg font-semibold ${
-                        toggleStates[divKey] ? "text-green-500" : "text-red-500"
-                      }`}
-                    >
-                      {toggleStates[divKey] ? "SAFE" : "DANGER"}
-                    </span>
-                    <div
-                      className={`relative w-12 h-6 rounded-full cursor-pointer transition-all ${
-                        toggleStates[divKey] ? "bg-green-500" : "bg-red-500"
-                      }`}
-                      onClick={() => toggleHandler(divKey)}
-                    >
-                      <div
-                        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
-                          toggleStates[divKey] ? "transform translate-x-6" : ""
-                        }`}
-                      ></div>
-                    </div>
-                  </div>
-
-                  {/* First Placeholder Row with Toggle */}
+            <div className="w-full flex justify-around gap-2 ">
+              <div className="w-auto bg-gray-200 rounded-xl px-3 py-2 flex flex-col gap-3">
+                <h2 className="text-center text-xl p-2 px-3 font-semibold text-gray-700 bg-gray-300 py-2 rounded-lg">
+                  BREAKER’s MAIN I/C STATUS
+                </h2>
+                {items.slice(0, 4).map((item) => (
                   <div
-                    className="w-full h-1/2 flex justify-between items-center p-2 bg-gray-300 rounded-xl"
-                    onClick={() => toggleHandler(`${divKey}RowPlaceholder`)}
+                    key={item.id}
+                    className={`w-full flex justify-between items-center p-2 rounded-xl cursor-pointer ${toggleStates[item.id]
+                        ? "bg-green-500"
+                        : "bg-red-500"
+                      }`}
+                    onClick={() => toggleHandler(item.id)}
                   >
-                    <span
-                      className={`text-lg font-semibold ${
-                        toggleStates[`${divKey}RowPlaceholder`] ? "text-green-500" : "text-red-500"
-                      }`}
-                    >
-                      {toggleStates[`${divKey}RowPlaceholder`] ? "SAFE" : "DANGER"}
+                    <span className="text-white font-semibold">
+                      {item.text}
                     </span>
-                    <div
-                      className={`relative w-12 h-6 rounded-full cursor-pointer transition-all ${
-                        toggleStates[`${divKey}RowPlaceholder`] ? "bg-green-500" : "bg-red-500"
-                      }`}
-                    >
-                      <div
-                        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
-                          toggleStates[`${divKey}RowPlaceholder`] ? "transform translate-x-6" : ""
-                        }`}
-                      ></div>
-                    </div>
+                    <span className="text-lg font-semibold mr-3">
+                      {toggleStates[item.id] ? "SAFE" : "DANGER"}
+                    </span>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
 
-              {/* Fifth Div with Toggle buttons */}
-              {["alert1", "alert2"].map((alertKey, index) => (
-                <div key={index} className="alert w-1/4  bg-gray-200 rounded-xl p-2 flex flex-col gap-2">
-                  {/* First Row with Toggle */}
+              <div className="w-1/4 bg-gray-200 rounded-xl px-3 py-2 flex flex-col gap-3">
+                <h2 className="text-center text-xl font-semibold text-gray-700 bg-gray-300 py-2 rounded-lg">
+                  AHU FAULT STATUS
+                </h2>
+                {items.slice(4).map((item) => (
                   <div
-                    className="w-full h-1/3 flex justify-between items-center p-2 bg-gray-300 rounded-xl"
-                    onClick={() => toggleHandler(`${alertKey}Row1`)}
+                    key={item.id}
+                    className={`w-full flex justify-between items-center p-2 rounded-xl cursor-pointer ${toggleStates[item.id]
+                        ? "bg-green-500"
+                        : "bg-red-500"
+                      }`}
+                    onClick={() => toggleHandler(item.id)}
                   >
-                    <span
-                      className={`text-lg font-semibold ${
-                        toggleStates[`${alertKey}Row1`] ? "text-green-500" : "text-red-500"
-                      }`}
-                    >
-                      {toggleStates[`${alertKey}Row1`] ? "SAFE" : "DANGER"}
+                    <span className="text-white font-semibold">
+                      {item.text}
                     </span>
-                    <div
-                      className={`relative w-12 h-6 rounded-full cursor-pointer transition-all ${
-                        toggleStates[`${alertKey}Row1`] ? "bg-green-500" : "bg-red-500"
-                      }`}
-                    >
-                      <div
-                        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
-                          toggleStates[`${alertKey}Row1`] ? "transform translate-x-6" : ""
-                        }`}
-                      ></div>
-                    </div>
+                    <span className="text-lg font-semibold mr-3">
+                      {toggleStates[item.id] ? "SAFE" : "DANGER"}
+                    </span>
                   </div>
+                ))}
+              </div>
 
-                  {/* Second Row with Toggle */}
-                  <div
-                    className="w-full h-1/3 flex justify-between items-center p-2 bg-gray-300 rounded-xl"
-                    onClick={() => toggleHandler(`${alertKey}Row2`)}
-                  >
-                    <span
-                      className={`text-lg font-semibold ${
-                        toggleStates[`${alertKey}Row2`] ? "text-green-500" : "text-red-500"
-                      }`}
-                    >
-                      {toggleStates[`${alertKey}Row2`] ? "SAFE" : "DANGER"}
-                    </span>
+              <div className="w-auto bg-gray-200 rounded-xl px-3 py-2 flex flex-col gap-2">
+                <h2 className="text-center text-xl px-3 font-semibold text-black opacity-75 bg-gray-300 py-2 rounded-lg">
+                  CRITICAL ROOMS (T & RH)
+                </h2>
+                {[{ label: "UPS ROOM" }, { label: "BATT ROOM" }, { label: "HUB ROOM" }, { label: "SER ROOM" }].map(
+                  (room, index) => (
                     <div
-                      className={`relative w-12 h-6 rounded-full cursor-pointer transition-all ${
-                        toggleStates[`${alertKey}Row2`] ? "bg-green-500" : "bg-red-500"
-                      }`}
+                      key={index}
+                      className="flex justify-between items-center bg-green-500 p-2 rounded-lg"
                     >
-                      <div
-                        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
-                          toggleStates[`${alertKey}Row2`] ? "transform translate-x-6" : ""
-                        }`}
-                      ></div>
+                      <span className="text-white font-semibold">{room.label}</span>
+                      <div className="w-[50px] h-[30px] bg-black text-white flex items-center justify-center rounded-lg">
+                        {randomValue()}
+                      </div>
                     </div>
-                  </div>
-
-                  {/* Third Row with Toggle */}
-                  <div
-                    className="w-full h-1/3 flex justify-between items-center p-2 bg-gray-300 rounded-xl"
-                    onClick={() => toggleHandler(`${alertKey}Row3`)}
-                  >
-                    <span
-                      className={`text-lg font-semibold ${
-                        toggleStates[`${alertKey}Row3`] ? "text-green-500" : "text-red-500"
-                      }`}
-                    >
-                      {toggleStates[`${alertKey}Row3`] ? "SAFE" : "DANGER"}
-                    </span>
-                    <div
-                      className={`relative w-12 h-6 rounded-full cursor-pointer transition-all ${
-                        toggleStates[`${alertKey}Row3`] ? "bg-green-500" : "bg-red-500"
-                      }`}
-                    >
-                      <div
-                        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
-                          toggleStates[`${alertKey}Row3`] ? "transform translate-x-6" : ""
-                        }`}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  )
+                )}
+              </div>
             </div>
+          </div>
+          <div className="w-auto rounded-xl px-3 py-4 flex flex-row gap-40 mt-5 mx-6">
+            {data.map((section) => (
+              <div
+                key={section.id}
+                className="w-full bg-gray-300 rounded-xl px-3 py-4 flex flex-col gap-2"
+              >
+                <h3 className="text-center text-xl px-3 font-semibold text-black opacity-75 bg-gray-300 py-2 rounded-lg">
+                  {section.title}
+                </h3>
+                {section.labels.map((label, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center bg-green-500 p-2 rounded-lg"
+                  >
+                    <span className="text-white font-semibold">{label}</span>
+                    <div className="w-[50px] h-[30px] bg-black text-white flex items-center justify-center rounded-lg">
+                      {randomValue()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Right Column */}
-        <div className="w-[20%] h-full flex flex-col gap-4 items-center justify-between">
-          <div className="w-full h-1/2 flex flex-col gap-4 items-center">
-            <h1 className="text-xl font-semibold">Status</h1>
-            <div className="status w-[10rem] h-[10rem] rounded-xl flex justify-center items-center relative">
-              {/* Glow Effect */}
-              <div className="absolute w-[12rem] h-[12rem] rounded-full blur-xl opacity-30 animate-pulse"></div>
-
-              {/* Spinning Loader */}
-              <div className="w-[90%] h-[90%] rounded-full border-8 border-t-green-500 border-transparent animate-spin shadow-[0_0_20px_10px_rgba(34,197,94,0.6)]"></div>
-              {/* Centered Text */}
-              <p className="absolute text-xl font-semibold text-green-500">
-                SAFE
-              </p>
-            </div>
+        <div className="w-[25%] h-full flex flex-col gap-5 items-center justify-between">
+          <div className="flex items-center justify-center w-full h-[200px]">
+            <SegmentedCircleBar />
           </div>
 
-          {/* Placeholder Section */}
-          <div className="w-full h-1/2 bg-gray-200 rounded-xl p-2 flex flex-col gap-2 items-center">
-            <div className="w-full h-1/4 bg-gray-300 rounded-xl"></div>
-            <div className="w-full h-1/4 bg-gray-300 rounded-xl"></div>
-            <div className="w-full h-1/4 bg-gray-300 rounded-xl"></div>
-            {/* <div className="w-full h-1/4 bg-gray-300 rounded-xl"></div> */}
+          <div className="w-full h-2/3 bg-gray-200 rounded-xl p-4 flex flex-col gap-2 items-center overflow-y-scroll">
+            <h2 className="text-center text-xl font-semibold text-gray-700 mb-2">Alerts</h2>
+            {alerts.map((alert, index) => (
+              <div key={index} className="w-full bg-white rounded-lg p-3 shadow-md text-sm text-gray-700">
+                <p>
+                  <strong>Timestamp:</strong> {alert.timestamp}
+                </p>
+                <p>
+                  <strong>Floor:</strong> {alert.floor}
+                </p>
+                <p>
+                  <strong>Server:</strong> {alert.server}
+                </p>
+                <p>
+                  <strong>Component:</strong> {alert.component}
+                </p>
+                <p>
+                  <strong>Value:</strong> {alert.value}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

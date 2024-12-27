@@ -6,6 +6,8 @@ export default {
   ],  theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    import("tailwind-scrollbar-hide"),
+  ],
 }
 
